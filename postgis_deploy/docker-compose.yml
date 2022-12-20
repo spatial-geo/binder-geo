@@ -1,0 +1,15 @@
+version: '3'
+volumes:
+  postgres_data:
+      driver: local
+services:
+  mediavitrualcityDatabase:
+    image: some-postgis
+    container_name: postg12isilisidatabaseBis
+    volumes:
+      - /home/ahrrass/Documents/study/ILISI3/SpatialDB/database/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 45432:5432
