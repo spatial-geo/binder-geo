@@ -14,7 +14,8 @@ public interface SpringProfilesRepository extends CrudRepository<Profile, UUID> 
   @Modifying(clearAutomatically = true)
   @Query(
       value =
-          "INSERT INTO points(the_geom, profile_id) VALUES(ST_GeomFromText('POINT(:lon :lat)', 4326), ':id')",
+          "INSERT INTO points (lat, lon, the_geom, profile_id) VALUES\n"
+              + "  (:lon, :lat, ST_SetSRID(ST_MakePoint(:lon,:lat),4326), :p_id);",
       nativeQuery = true)
-  void insertPoint(@Param("lat") float lat, @Param("lon") float lon, @Param("id") UUID id);
+  void insertPoint(@Param("lat") float lat, @Param("lon") float lon, @Param("p_id") UUID p_id);
 }
