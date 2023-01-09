@@ -7,6 +7,7 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,11 +17,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @Log4j2
 public class SocketIOConfig {
 
-  //    @Value("${socket.host}")
-  private String SOCKETHOST = "0.0.0.0";
+  @Value("${socket.host}")
+  private String SOCKETHOST;
 
-  //    @Value("${socket.port}")
-  private int SOCKETPORT = 8878;
+  @Value("${socket.port}")
+  private int SOCKETPORT;
 
   private SocketIOServer server;
 
