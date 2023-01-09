@@ -1,6 +1,7 @@
 package org.ilisi.geobinder.configuration;
 
 import com.corundumstudio.socketio.Configuration;
+import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
@@ -30,6 +31,9 @@ public class SocketIOConfig {
     Configuration configuration = new Configuration();
     configuration.setHostname(SOCKETHOST);
     configuration.setPort(SOCKETPORT);
+
+    SocketConfig socketIOConfig = configuration.getSocketConfig();
+    socketIOConfig.setReuseAddress(true);
 
     server = new SocketIOServer(configuration);
     server.start();
