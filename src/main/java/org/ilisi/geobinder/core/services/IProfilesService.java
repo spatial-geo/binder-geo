@@ -1,12 +1,13 @@
 package org.ilisi.geobinder.core.services;
 
+import org.ilisi.geobinder.core.controllers.dtos.ProfileRespDTO;
 import org.ilisi.geobinder.core.repositories.entities.Profile;
 
 public interface IProfilesService {
 
-  Profile createProfile(String fullName, String profession);
+  ProfileRespDTO createProfile(String fullName, String profession, float radius);
 
   Iterable<Profile> getAllProfiles();
 
-  void insertPoint(float lon, float lat, String profile_id);
+  void insertPoint(double lon, double lat, String profile_id);
 }

@@ -6,6 +6,8 @@ public record PointDTO(
         @NotNull
         float lon,
         @NotNull
-        float lat ) {
+        float lat,
+        @NotNull
+        String idUser) {
 
 }

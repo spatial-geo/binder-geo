@@ -19,6 +19,8 @@ public class Profile {
 
   private String fullName;
 
+  private float radius;
+
   @ManyToOne
   @JoinColumn(name = "profession_id", nullable = false)
   private Profession profession;
@@ -26,8 +28,9 @@ public class Profile {
   @OneToMany(mappedBy = "profile")
   private Set<PointC> trajectory;
 
-  public Profile(String fullName, Profession profession) {
+  public Profile(String fullName, Profession profession, float radius) {
     this.fullName = fullName;
     this.profession = profession;
+    this.radius = radius;
   }
 }

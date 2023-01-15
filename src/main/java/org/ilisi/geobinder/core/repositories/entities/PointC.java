@@ -3,9 +3,11 @@ package org.ilisi.geobinder.core.repositories.entities;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
+import java.sql.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.locationtech.jts.geom.Geometry;
 import org.n52.jackson.datatype.jts.GeometryDeserializer;
 import org.n52.jackson.datatype.jts.GeometrySerializer;
@@ -28,4 +30,8 @@ public class PointC {
   @ManyToOne
   @JoinColumn(name = "profile_id", nullable = false)
   private Profile profile;
+
+  @CreationTimestamp
+  @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Date createdAt;
 }
