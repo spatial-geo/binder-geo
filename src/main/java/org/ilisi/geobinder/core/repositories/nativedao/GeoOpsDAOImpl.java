@@ -11,6 +11,7 @@ public class GeoOpsDAOImpl implements GeoOpsDAO {
   JdbcTemplate jdbcTemplate;
 
   private final int SRID_REF = 4326;
+  private final int METRAGE = 900913;
 
   private final String SQL_GET_LAST_GEOM_STRING =
       "SELECT the_geom FROM public.points where profile_id = ? order by created_at desc limit 1";
@@ -19,7 +20,7 @@ public class GeoOpsDAOImpl implements GeoOpsDAO {
       "select ST_Buffer(ST_SetSRID(ST_MakePoint(?, ?), ?), ?)";
 
   private final String SQL_CIRCLE_CONTAINS_POINT =
-      "SELECT st_intersects(ST_Buffer(ST_SetSRID(ST_MakePoint(?, ?), ?), ?), ST_SetSRID(ST_MakePoint(?, ?), ?))";
+      "SELECT st_intersects(st_transform(st_buffer(st_transform(ST_SetSRID(ST_MakePoint(?, ?), ?), ?),?),?), ST_SetSRID(ST_MakePoint(?, ?), ?))";
 
   public GeoOpsDAOImpl(DataSource dataSource) {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -38,14 +39,17 @@ public class GeoOpsDAOImpl implements GeoOpsDAO {
         new Object[] {lon, lat, SRID_REF, radius},
         String.class);
   }
-
+  // lon, lat, ref, met, rad, ref, lon, lat, ref
   @Override
   public boolean circleContainsPoint(
       double centerLon, double centerLat, double radius, double pointLon, double pointLat) {
     return Boolean.TRUE.equals(
         jdbcTemplate.queryForObject(
             SQL_CIRCLE_CONTAINS_POINT,
-            new Object[] {centerLon, centerLat, SRID_REF, radius, pointLon, pointLat, SRID_REF},
+            new Object[] {
+              centerLon, centerLat, SRID_REF, METRAGE, radius, SRID_REF, pointLon, pointLat,
+              SRID_REF
+            },
             Boolean.class));
   }
 }
