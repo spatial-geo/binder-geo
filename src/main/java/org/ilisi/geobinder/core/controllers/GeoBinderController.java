@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.ilisi.geobinder.core.controllers.dtos.CreateProfileDTO;
 import org.ilisi.geobinder.core.controllers.dtos.PointDTO;
+import org.ilisi.geobinder.core.controllers.dtos.ProfileRespDTO;
 import org.ilisi.geobinder.core.repositories.entities.Profile;
 import org.ilisi.geobinder.core.services.IProfilesService;
 import org.springframework.http.HttpStatus;
@@ -23,10 +24,12 @@ public class GeoBinderController {
   }
 
   @PostMapping
-  public ResponseEntity<Profile> createProfile(@RequestBody CreateProfileDTO createProfileDTO) {
-    Profile _profile =
-        profilesService.createProfile(createProfileDTO.fullName(), createProfileDTO.profession());
-    return new ResponseEntity<>(_profile, HttpStatus.CREATED);
+  public ResponseEntity<ProfileRespDTO> createProfile(
+      @RequestBody CreateProfileDTO createProfileDTO) {
+    return new ResponseEntity<ProfileRespDTO>(
+        profilesService.createProfile(
+            createProfileDTO.fullName(), createProfileDTO.profession(), createProfileDTO.radius()),
+        HttpStatus.CREATED);
   }
 
   @GetMapping

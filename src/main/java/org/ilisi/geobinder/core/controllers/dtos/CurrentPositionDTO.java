@@ -2,12 +2,14 @@ package org.ilisi.geobinder.core.controllers.dtos;
 
 import jakarta.validation.constraints.NotNull;
 
-public record CreateProfileDTO(
+public record CurrentPositionDTO(
         @NotNull
-        String fullName,
+        String idUser,
         @NotNull
-        String profession,
+        String isSession,
         @NotNull
-        float radius
+        float lon,
+        @NotNull
+        float lat
 ) {
 }
