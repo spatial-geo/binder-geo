@@ -55,4 +55,14 @@ public class ProfilesService implements IProfilesService {
     System.out.println("The point geom : " + circleGeom);
     System.out.println("The circle contains point : " + isContains);
   }
+
+  @Override
+  public ProfileRespDTO getProfileById(UUID profileId) {
+    Profile _profile = this.springProfilesRepository.findById(profileId).orElseThrow();
+    return new ProfileRespDTO(
+        _profile.getId().toString(),
+        _profile.getFullName(),
+        _profile.getProfession().getName(),
+        _profile.getRadius());
+  }
 }

@@ -5,5 +5,8 @@ import lombok.Data;
 @Data
 public class ProfileSession {
   private String idUser;
-  private GeoPoint currentPosition;
+  private String fullName;
+  private String profession;
+  private double lon;
+  private double lat;
 }

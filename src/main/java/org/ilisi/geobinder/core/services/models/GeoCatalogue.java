@@ -1,11 +1,9 @@
 package org.ilisi.geobinder.core.services.models;
 
+import java.util.*;
+import org.ilisi.geobinder.core.controllers.dtos.ProfileRespDTO;
 import org.ilisi.geobinder.core.repositories.nativedao.GeoOpsDAO;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.ilisi.geobinder.core.services.IProfilesService;
 
 // singleton class to store connected sessions
 public class GeoCatalogue {
@@ -27,13 +25,20 @@ public class GeoCatalogue {
     this.profileSessions.put(sessionId, profileSession);
   }
 
-  public void updateCurrentPosition(String sessionId, String profileId, GeoPoint newPosition) {
+  public void updateCurrentPosition(
+      String sessionId, IProfilesService profilesService, String profileId, GeoPoint newPosition) {
     ProfileSession profileSession = this.profileSessions.get(sessionId);
     if (profileSession == null) {
+
+      ProfileRespDTO profileRespDTO = profilesService.getProfileById(UUID.fromString(profileId));
+
       profileSession = new ProfileSession();
       profileSession.setIdUser(profileId);
+      profileSession.setFullName(profileRespDTO.fullName());
+      profileSession.setProfession(profileRespDTO.profession());
     }
-    profileSession.setCurrentPosition(newPosition);
+    profileSession.setLon(newPosition.lon);
+    profileSession.setLat(newPosition.lat);
     this.profileSessions.put(sessionId, profileSession);
   }
 
@@ -41,21 +46,26 @@ public class GeoCatalogue {
     this.profileSessions.remove(sessionId);
   }
 
-  public List<String> getSessionNeighboursByRadius(GeoOpsDAO geoOpsDAO, double centerLon, double centerLat, double radius)
-  {
-    return this
-            .profileSessions
-            .entrySet()
-            .stream()
-            .filter(session ->
-                    geoOpsDAO
-                            .circleContainsPoint(
-                                    centerLon,
-                                    centerLat,
-                                    radius,
-                                    session.getValue().getCurrentPosition().getLon(),
-                                    session.getValue().getCurrentPosition().getLat()))
-            .map(Map.Entry::getKey).collect(Collectors.toList());
+  public List<ProfileSession> getSessionNeighboursByRadius(
+      String currentSession,
+      GeoOpsDAO geoOpsDAO,
+      double centerLon,
+      double centerLat,
+      double radius) {
+
+    List<ProfileSession> neighbours = new ArrayList<>();
+    for (Map.Entry<String, ProfileSession> profileSessionPair : this.profileSessions.entrySet()) {
+      if (!profileSessionPair.getKey().equals(currentSession)
+          && profileSessionPair.getValue() != null
+          && geoOpsDAO.circleContainsPoint(
+              centerLon,
+              centerLat,
+              radius,
+              profileSessionPair.getValue().getLon(),
+              profileSessionPair.getValue().getLat()))
+        neighbours.add(profileSessionPair.getValue());
+    }
+    return neighbours;
   }
 
   @Override
