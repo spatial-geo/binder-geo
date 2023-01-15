@@ -4,11 +4,14 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.ilisi.geobinder.core.controllers.dtos.PointDTO;
+import org.ilisi.geobinder.core.repositories.nativedao.GeoOpsDAO;
 import org.ilisi.geobinder.core.services.IProfilesService;
 import org.ilisi.geobinder.core.services.models.GeoCatalogue;
 import org.ilisi.geobinder.core.services.models.GeoPoint;
+import org.ilisi.geobinder.core.services.models.ProfileSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +21,13 @@ public class SocketIOController {
 
   @Autowired private SocketIOServer socketIOServer;
   private IProfilesService profilesService;
+  private GeoOpsDAO geoOpsDAO;
 
-  public SocketIOController(SocketIOServer socketIOServer, IProfilesService profilesService) {
+  public SocketIOController(
+      SocketIOServer socketIOServer, IProfilesService profilesService, GeoOpsDAO geoOpsDAO) {
     this.socketIOServer = socketIOServer;
     this.profilesService = profilesService;
+    this.geoOpsDAO = geoOpsDAO;
 
     this.socketIOServer.addConnectListener(onUserConnectListener);
     this.socketIOServer.addDisconnectListener(onUserDisconnectListener);
@@ -36,6 +42,7 @@ public class SocketIOController {
         GeoCatalogue.getCatalogueInstance()
             .addGeoSession(socketIOClient.getSessionId().toString(), null);
 
+        //        socketIOClient.sendEvent();
         System.out.println(GeoCatalogue.getCatalogueInstance());
       };
 
@@ -55,15 +62,27 @@ public class SocketIOController {
         currentClientPosition.setLon(pointDTO.lon());
         currentClientPosition.setLat(pointDTO.lat());
 
+        // TODO: the database call needs to be affected just if the user is empty
+
         GeoCatalogue.getCatalogueInstance()
             .updateCurrentPosition(
-                client.getSessionId().toString(), pointDTO.idUser(), currentClientPosition);
+                client.getSessionId().toString(),
+                profilesService,
+                pointDTO.idUser(),
+                currentClientPosition);
+
         profilesService.insertPoint(pointDTO.lon(), pointDTO.lat(), pointDTO.idUser());
 
         // TODO: Send point to the connected users in Catalogue by session ID and with running the
-        // ST_INTERSECTS function
-        this.socketIOServer.getBroadcastOperations().sendEvent("pointSent", client, pointDTO);
 
-        acknowledge.sendAckData("Message sent to all subscribers succefully");
+        String currentSessionId = client.getSessionId().toString();
+
+        List<ProfileSession> neighbours =
+            GeoCatalogue.getCatalogueInstance()
+                .getSessionNeighboursByRadius(
+                    currentSessionId, geoOpsDAO, pointDTO.lon(), pointDTO.lat(), pointDTO.radius());
+
+        this.socketIOServer.getClient(client.getSessionId()).sendEvent("neighbours", neighbours);
+        acknowledge.sendAckData(neighbours);
       };
 }

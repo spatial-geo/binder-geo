@@ -1,5 +1,6 @@
 package org.ilisi.geobinder.core.services;
 
+import java.util.UUID;
 import org.ilisi.geobinder.core.controllers.dtos.ProfileRespDTO;
 import org.ilisi.geobinder.core.repositories.entities.Profile;
 
@@ -10,4 +11,6 @@ public interface IProfilesService {
   Iterable<Profile> getAllProfiles();
 
   void insertPoint(double lon, double lat, String profile_id);
+
+  ProfileRespDTO getProfileById(UUID profileId);
 }

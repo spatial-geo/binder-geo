@@ -8,6 +8,8 @@ public record PointDTO(
         @NotNull
         float lat,
         @NotNull
-        String idUser) {
+        String idUser,
+        @NotNull
+        double radius) {
 
 }
